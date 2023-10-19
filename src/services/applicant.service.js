@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { provideResponse } = require('../../helper/response');
 // const applicantQuery = require('../queries/applicant.queries');
-const { runQuery } = require('../config/database.config');
+// const { runQuery } = require('../config/database.config');
 const config = require('../config/env/index');
 
 // create a applicant

@@ -2,15 +2,15 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../index');
-// const { applicantInfo } = require('../fixtures/applicant.fixture');
+const { applicantInfo } = require('../fixtures/applicant.fixture');
 
-const applicantInfo = {
-  email: 'gfa@gmail.com',
-  firstname: 'fifa',
-  lastname: 'league',
-  password: 'ugn9ug984ngregre',
-  phonenumber: '0000000000',
-};
+// const applicantInfo = {
+//   email: 'gfa@gmail.com',
+//   firstname: 'fifa',
+//   lastname: 'league',
+//   password: 'ugn9ug984ngregre',
+//   phonenumber: '0000000000',
+// };
 
 const loginData = {
   email: 'olduser@gmail.com',
