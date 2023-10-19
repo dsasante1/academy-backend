@@ -5,14 +5,15 @@ const { provideResponse } = require('../../helper/response');
 // const applicantQuery = require('../queries/applicant.queries');
 const { runQuery } = require('../config/database.config');
 const config = require('../config/env/index');
+
 // create a applicant
-const createApplicant = async (body, applicantQuery) => {
+const createApplicant = async (body, applicantQuery, queryExecutor) => {
   const {
     password, firstname, lastname, email, phonenumber,
   } = body;
 
   // Check if applicant already exist in db
-  const applicantExist = await runQuery(applicantQuery.findApplicantByEmail, [email]);
+  const applicantExist = await queryExecutor(applicantQuery.findApplicantByEmail, [email]);
 
   if (applicantExist.length > 0) {
     // eslint-disable-next-line no-throw-literal
@@ -26,13 +27,16 @@ const createApplicant = async (body, applicantQuery) => {
   const saltRounds = 12;
   const hash = bcrypt.hashSync(password, saltRounds);
 
-  const response = await runQuery(applicantQuery.addApplicant, [
-    email,
-    firstname,
-    lastname,
-    hash,
-    phonenumber,
-  ]);
+  const response = await queryExecutor(
+    applicantQuery.addApplicant,
+    [
+      email,
+      firstname,
+      lastname,
+      hash,
+      phonenumber,
+    ],
+  );
 
   return provideResponse(
     'success',
@@ -44,11 +48,11 @@ const createApplicant = async (body, applicantQuery) => {
 
 // applicant login
 
-const loginApplicant = async (body, applicantQuery) => {
+const loginApplicant = async (body, applicantQuery, queryExecutor) => {
   const { email, password } = body;
 
   // Check if that applicant exists inside the db
-  const applicant = await runQuery(applicantQuery.findApplicantByEmail, [email]);
+  const applicant = await queryExecutor(applicantQuery.findApplicantByEmail, [email]);
 
   if (applicant.length === 0) {
     throw {
@@ -103,8 +107,8 @@ const loginApplicant = async (body, applicantQuery) => {
 };
 
 // Fetches all applicants in the database
-const getAllApplicants = async (applicantQuery) => {
-  const applicants = await runQuery(applicantQuery.fetchAllApplicants);
+const getAllApplicants = async (applicantQuery, queryExecutor) => {
+  const applicants = await queryExecutor(applicantQuery.fetchAllApplicants);
   return provideResponse(
     'success',
     200,
@@ -114,8 +118,9 @@ const getAllApplicants = async (applicantQuery) => {
 };
 
 // upload applicant image src to database
-const setApplicantImageDb = async (email, imageUrl, applicantQuery) => {
-  const [applicantImg = null] = await runQuery(applicantQuery.applicantImgSrc, [imageUrl, email]);
+const setApplicantImageDb = async (email, imageUrl, applicantQuery, queryExecutor) => {
+  // eslint-disable-next-line max-len
+  const [applicantImg = null] = await queryExecutor(applicantQuery.applicantImgSrc, [imageUrl, email]);
 
   if (!applicantImg) {
     throw {
@@ -128,8 +133,9 @@ const setApplicantImageDb = async (email, imageUrl, applicantQuery) => {
 };
 
 // Upload doc url to database
-const setApplicantDocDb = async (email, cvUrl, applicantQuery) => {
-  const [applicantDoc = null] = await runQuery(applicantQuery.applicantDocumentSrc, [cvUrl, email]);
+const setApplicantDocDb = async (email, cvUrl, applicantQuery, queryExecutor) => {
+  // eslint-disable-next-line max-len
+  const [applicantDoc = null] = await queryExecutor(applicantQuery.applicantDocumentSrc, [cvUrl, email]);
 
   if (!applicantDoc) {
     throw {
@@ -142,12 +148,12 @@ const setApplicantDocDb = async (email, cvUrl, applicantQuery) => {
 };
 
 // Upload applicants details to database
-const setApplicantDetailsDb = async (body, applicantQuery) => {
+const setApplicantDetailsDb = async (body, applicantQuery, queryExecutor) => {
   const {
     address, course, university, cgpa, dob, email,
   } = body;
 
-  const [applicantDoc = null] = await runQuery(
+  const [applicantDoc = null] = await queryExecutor(
     applicantQuery.applicantDetails,
     [address, course, university, cgpa, dob, email],
   );

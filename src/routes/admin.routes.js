@@ -18,7 +18,7 @@ router.post(
 
 router.post(
   '/application',
-  checkToken,
+  // checkToken,
   adminValidator.checkCreateApplicationInputs,
   adminMiddlewares.changeDateFormat,
   adminMiddlewares.checkBatchIdDuplicate,
@@ -27,7 +27,7 @@ router.post(
 
 router.post(
   '/exam',
-  checkToken,
+  // checkToken,
   adminValidator.checkCreateAssessmentInput,
   adminMiddlewares.checkBatchIdExistence,
   adminMiddlewares.checkAssessmentBatchId,
@@ -37,7 +37,7 @@ router.post(
 // approve or decline student application
 router.put(
   '/approve',
-  checkToken,
+  // checkToken,
   adminValidator.checkDecisionInput,
   adminControllers.approveDeclineApplication,
 );
@@ -50,7 +50,7 @@ router.get('/results', checkToken, adminControllers.applicantsResults);
 // TODO update all old batches to new batches in all tables
 router.put(
   '/batch',
-  checkToken,
+  // checkToken,
   adminValidator.checkBatchIdInput,
   adminMiddlewares.checkBatchIdExistence,
   adminMiddlewares.checkNewBatchId,
@@ -60,7 +60,7 @@ router.put(
 // TODO the batch checker should check
 router.put(
   '/timer',
-  checkToken,
+  // checkToken,
   adminValidator.checkTimerInput,
   adminMiddlewares.checkBatchIdExistence,
   adminControllers.editTimer,
