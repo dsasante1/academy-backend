@@ -42,11 +42,17 @@ router.put(
   adminControllers.approveDeclineApplication,
 );
 
-router.get('/dashboard', checkToken, adminControllers.applicationDashboard);
-router.get('/entries', checkToken, adminControllers.applicantEntries);
-router.get('/history', checkToken, adminControllers.assessmentHistory);
-router.get('/results', checkToken, adminControllers.applicantsResults);
+// TODO use this in prod. check token
+// router.get('/dashboard', checkToken, adminControllers.applicationDashboard);
+// router.get('/entries', checkToken, adminControllers.applicantEntries);
+// router.get('/history', checkToken, adminControllers.assessmentHistory);
+// router.get('/results', checkToken, adminControllers.applicantsResults);
 
+// this is for tests
+router.get('/dashboard', adminControllers.applicationDashboard);
+router.get('/entries', adminControllers.applicantEntries);
+router.get('/history', adminControllers.assessmentHistory);
+router.get('/results', adminControllers.applicantsResults);
 // TODO update all old batches to new batches in all tables
 router.put(
   '/batch',

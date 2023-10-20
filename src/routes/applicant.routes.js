@@ -23,7 +23,7 @@ router.post(
   validator.checkFileUpload,
   validator.checkApplicationInput,
   applicantMiddleware.getCurrentBatchId,
-  applicantMiddleware.setBatchId(),
+  applicantMiddleware.setBatchId,
   applicantMiddleware.applicantImageUploader,
   applicantControllers.applicantImageDb(),
   applicantMiddleware.applicantDocUploader,

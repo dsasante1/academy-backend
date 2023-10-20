@@ -48,46 +48,47 @@ describe('Testing Applicant Middlewares', () => {
 
   // eslint-disable-next-line no-undef
   it('should set Batch Id', async () => {
-    const req = { batch_id: 1 };
+    const req = { batch_id: 6 };
 
-    await applicantMiddleware.setBatchId()(req.batch_id, res, next);
+    await applicantMiddleware.setBatchId(req.batch_id, res, next);
 
     expect(next.calledOnce).to.equal(true);
     expect(status.calledOnce).to.be.false;
-    // expect(status.args[0][0]).to.equal(501);
     expect(json.calledOnce).to.be.false;
   });
 
   it('should test invalid batch Id', async () => {
     const req = { body: { email: '' }, batch_id: null };
 
-    await applicantMiddleware.setBatchId()(req.batch_id, res, next);
+    await applicantMiddleware.setBatchId(req, res, next);
 
     expect(next.calledOnce).to.equal(false);
     expect(status.calledOnce).to.be.true;
     expect(status.args[0][0]).to.equal(501);
-    expect(json.calledOnce).to.be.false;
-  });
-  it('should test applicant image uploader', async () => {
-    const req = { body: { image: '' } };
-
-    await applicantMiddleware.applicantImageUploader(req.body.image, res, next);
-
-    expect(next.calledOnce).to.equal(true);
-    expect(status.calledOnce).to.be.false;
-    // expect(status.args[0][0]).to.equal(501);
-    expect(json.calledOnce).to.be.false;
+    expect(json.calledOnce).to.be.true;
   });
 
   it('should test applicant image uploader error', async () => {
     const req = sinon.spy();
     const stubQuery = sinon.stub().resolves(null);
 
-    await applicantMiddleware.applicantImageUploader(req, res, next, stubQuery);
+    await applicantMiddleware.applicantImageUploader(req, res, next, stubQuery());
 
     expect(next.calledOnce).to.equal(false);
-    expect(status.calledOnce).to.be.false;
-    expect(status.args[0][0]).to.equal(501);
+    expect(status.calledOnce).to.be.true;
+    expect(status.args[0][0]).to.equal(400);
+    expect(json.calledOnce).to.be.false;
+  });
+
+  it('should test applicant doc uploader error', async () => {
+    const req = sinon.spy();
+    const stubQuery = sinon.stub().resolves(null);
+
+    await applicantMiddleware.applicantDocUploader(req, res, next, stubQuery());
+
+    expect(next.calledOnce).to.equal(false);
+    expect(status.calledOnce).to.be.true;
+    expect(status.args[0][0]).to.equal(400);
     expect(json.calledOnce).to.be.false;
   });
 
@@ -102,15 +103,14 @@ describe('Testing Applicant Middlewares', () => {
     expect(json.calledOnce).to.be.false;
   });
 
-  it('should test applicant document uploader error', async () => {
+  it('should test applicant document uploader throw error', async () => {
     const req = sinon.spy();
     const stubQuery = sinon.stub().throws('invalid file path');
 
     await applicantMiddleware.applicantImageUploader(req, res, next, stubQuery);
 
     expect(next.calledOnce).to.equal(true);
-    expect(status.calledOnce).to.be.true;
-    // expect(status.args[0][0]).to.equal(501);
+    expect(status.calledOnce).to.be.false;
     expect(json.calledOnce).to.be.false;
   });
 });

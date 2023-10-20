@@ -33,29 +33,29 @@ const getCurrentBatchId = async (req, res, next, queries = queryRunner(adminQuer
   }
 };
 // set applicant batch id
-function setBatchId(queries = applicantQueries.setApplicantBatchId) {
-  return async (req, res, next) => {
-    try {
-      const { email } = req.body;
+// function setBatchId(queries = applicantQueries.setApplicantBatchId) {
 
-      // eslint-disable-next-line prefer-destructuring
-      const batch_id = req.batch_id;
+const setBatchId = async (req, res, next, queries = applicantQueries.setApplicantBatchId) => {
+  try {
+    const { email } = req.body;
 
-      const [setBatch = null] = await runQuery(
-        queries,
-        [email, batch_id],
-      );
+    // eslint-disable-next-line prefer-destructuring
+    const batch_id = req.batch_id;
 
-      if (!setBatch) {
-        return responseProvider(res, null, 'batch id not set', 501);
-      }
+    const [setBatch = null] = await runQuery(
+      queries,
+      [email, batch_id],
+    );
 
-      return next();
-    } catch (error) {
-      return next(error);
+    if (!setBatch) {
+      return responseProvider(res, null, 'batch id not set', 501);
     }
-  };
-}
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
 
 const getSecureUrl = async (filePath = '') => {
   try {
@@ -70,14 +70,15 @@ const getSecureUrl = async (filePath = '') => {
   }
 };
 
+// TODO remove duplicated funcntions
 // upload applicant image
-const applicantImageUploader = async (req, res, next) => {
+const applicantImageUploader = async (req, res, next, fetchSecureUrl = getSecureUrl) => {
   try {
     const { image } = req.files;
     const imagePath = image[0].path;
 
     const imgUrl = await new Promise((resolve) => {
-      setTimeout(() => resolve(getSecureUrl(imagePath)), 900);
+      setTimeout(() => resolve(fetchSecureUrl(imagePath)), 900);
     });
 
     if (!imgUrl || imgUrl instanceof Error) {
@@ -93,13 +94,13 @@ const applicantImageUploader = async (req, res, next) => {
 };
 
 // upload applicant cv document
-const applicantDocUploader = async (req, res, next) => {
+const applicantDocUploader = async (req, res, next, fetchSecureUrl = getSecureUrl) => {
   try {
     const { cv } = req.files;
     const cvPath = cv[0].path;
 
     const cvUrl = await await new Promise((resolve) => {
-      setTimeout(() => resolve(getSecureUrl(cvPath)), 900);
+      setTimeout(() => resolve(fetchSecureUrl(cvPath)), 900);
     });
 
     if (!cvUrl || cvUrl instanceof Error) {

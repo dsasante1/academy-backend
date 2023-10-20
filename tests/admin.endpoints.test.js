@@ -2,7 +2,6 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../index');
-// const { userData } = require( '../fixtures/user.fixture.js');
 
 const assessmentData = {
   batch: 4,
@@ -38,7 +37,7 @@ const assessmentData = {
 const applicationData = {
   link: 'https://enyata.com/',
   closure_date: '31/12/2020',
-  batch_id: 1,
+  batch_id: 5,
   instructions: '1. a whole lot of instructions 2. another instruction. 3. the last piece of advice',
 };
 
@@ -53,7 +52,7 @@ const timerDataNonExistingBatchId = {
 };
 
 const approvalData = {
-  email: 'newuser@gmail.com',
+  email: 'clark@dailyplanet.com',
   applicationStatus: 'declined',
 };
 

@@ -13,8 +13,8 @@ const { applicantInfo } = require('../fixtures/applicant.fixture');
 // };
 
 const loginData = {
-  email: 'olduser@gmail.com',
-  password: 'gnopgn4t45y-4rggkjnr343',
+  email: 'clark@dailyplanet.com',
+  password: 'letwaltwhite88io',
 };
 
 const applicantNoSignIn = {
