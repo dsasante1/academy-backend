@@ -6,10 +6,10 @@ const { runQuery } = require('../config/database.config');
 
 // Controller creating a new applicant
 // eslint-disable-next-line max-len
-function createApplicant(service = applicantService, query = applicantQuery, queryExecutor = runQuery) {
+function createApplicant(service = applicantService.createApplicant, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
     try {
-      const response = await service.createApplicant(req.body, query, queryExecutor);
+      const response = await service(req.body, query, queryExecutor);
 
       return res.status(response.code).json(response);
     } catch (error) {
@@ -20,10 +20,10 @@ function createApplicant(service = applicantService, query = applicantQuery, que
 
 // Login controller
 
-function signInApplicant(service = applicantService, query = applicantQuery, queryExecutor = runQuery) {
+function signInApplicant(service = applicantService.loginApplicant, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
     try {
-      const result = await service.loginApplicant(req.body, query, queryExecutor);
+      const result = await service(req.body, query, queryExecutor);
       return res.status(result.code).json(result);
     } catch (error) {
       next(error);
@@ -32,14 +32,14 @@ function signInApplicant(service = applicantService, query = applicantQuery, que
 }
 
 // upload applicant image src to database
-function applicantImageDb(service = applicantService, query = applicantQuery, queryExecutor = runQuery) {
+function applicantImageDb(service = applicantService.setApplicantImageDb, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
     try {
       const { email } = req.body;
 
       const imageUrl = req.imgUrl;
 
-      await service.setApplicantImageDb(imageUrl, email, query, queryExecutor);
+      await service(imageUrl, email, query, queryExecutor);
 
       // return res.status(result.code).json(result);
       return next();
@@ -67,10 +67,10 @@ function applicantDocDb(service = applicantService, query = applicantQuery, quer
 }
 
 // Upload applicant details to database
-function applicantDetailsDb(service = applicantService, query = applicantQuery, queryExecutor = runQuery) {
+function applicantDetailsDb(service = applicantService.setApplicantDetailsDb, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
     try {
-      const response = await service.setApplicantDetailsDb(req.body, query, queryExecutor);
+      const response = await service(req.body, query, queryExecutor);
 
       return res.status(response.code).json(response);
     } catch (error) {
