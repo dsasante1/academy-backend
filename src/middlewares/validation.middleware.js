@@ -79,7 +79,6 @@ function isCgpaValid(cgpa) {
 
 // todo: refactor repetive validators
 // todo: auto populate email, first, last name
-
 const checkApplicationInput = (req, res, next) => {
   try {
     const {
@@ -92,7 +91,6 @@ const checkApplicationInput = (req, res, next) => {
       cgpa,
       dob,
     } = req.body;
-
 
     if (typeof address !== 'string' || !address) {
       return responseProvider(res, null, 'provide a valid address', 400);
@@ -121,16 +119,13 @@ const checkApplicationInput = (req, res, next) => {
   }
 };
 
-
-
-// TODO check uploaded files
-
-const checkFileUpload = (req, res, next) => {
+// TODO check uploaded files. refactor the path
+const checkFileUpload = (req, res, next, getPath = path.extname) => {
   try {
     const { cv } = req.files;
     const { image } = req.files;
 
-    if (!checkImageExtension(path.extname(image[0].originalname)) || path.extname(cv[0].originalname) !== '.pdf') {
+    if (!checkImageExtension(getPath(image[0].originalname)) || getPath(cv[0].originalname) !== '.pdf') {
       return responseProvider(res, null, 'invalid file', 400);
     }
 
@@ -141,7 +136,6 @@ const checkFileUpload = (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
