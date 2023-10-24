@@ -71,6 +71,12 @@ function isDateValid(date) {
   return false;
 }
 
+// validate cgpa is float
+function isCgpaValid(cgpa) {
+  const pattern = /^\d+\.\d+$/;
+  return pattern.test(cgpa);
+}
+
 // todo: refactor repetive validators
 // todo: auto populate email, first, last name
 
@@ -100,7 +106,8 @@ const checkApplicationInput = (req, res, next) => {
       return responseProvider(res, null, 'provide a valid university name', 400);
     }
 
-    if (typeof parseInt(cgpa, 10) !== 'number') {
+    // TODO use regex
+    if (!cgpa || !isCgpaValid(cgpa)) {
       return responseProvider(res, null, 'provide a valid cgpa', 400);
     }
 

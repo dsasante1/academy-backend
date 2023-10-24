@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha 'tests/applicant.middleware.test.js'",
+    "test": "mocha 'tests/validation.middleware.test.js'",
     "coverage": "nyc mocha tests/**/*.js",
     "start": "nodemon index.js",
     "migrate:create": "db-migrate create --config database.json -e dev",

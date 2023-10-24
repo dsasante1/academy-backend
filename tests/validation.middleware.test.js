@@ -103,7 +103,8 @@ const invalidCgpa = {
   address: 'accra, Ghana',
   course: 'chemistry',
   university: 'knust',
-  cgpa: 'hello',
+  dob: '04/04/2000',
+  cgpa: '',
 };
 
 const invalidImage = {
@@ -326,15 +327,15 @@ describe('validation middleware', () => {
     expect(json.args[0][0].message).to.equal('provide a valid phone number');
   });
 
-  it('should call next for valid sign up input', () => {
+  it('should call next for valid login input', () => {
     const req = { body: { ...loginData } };
-    validators.checkApplicantLoginInput(req, res, next);
+    validators.checkLoginInput(req, res, next);
     expect(next.calledOnce).to.equal(true);
   });
 
   it('should return 404 for invalid login password', () => {
     const req = { body: { ...invalidLoginPassword } };
-    validators.checkApplicantLoginInput(req, res, next);
+    validators.checkLoginInput(req, res, next);
     expect(next.calledOnce).to.equal(false);
     expect(status.calledOnce).to.be.true;
     expect(status.args[0][0]).to.equal(400);
@@ -344,7 +345,7 @@ describe('validation middleware', () => {
 
   it('should return 404 for no login password', () => {
     const req = { body: { ...noLoginPassword } };
-    validators.checkApplicantLoginInput(req, res, next);
+    validators.checkLoginInput(req, res, next);
     expect(next.calledOnce).to.equal(false);
     expect(status.calledOnce).to.be.true;
     expect(status.args[0][0]).to.equal(400);
@@ -354,7 +355,7 @@ describe('validation middleware', () => {
 
   it('should return 404 for invalid login email', () => {
     const req = { body: { ...invalidLoginEmail } };
-    validators.checkApplicantLoginInput(req, res, next);
+    validators.checkLoginInput(req, res, next);
     expect(next.calledOnce).to.equal(false);
     expect(status.calledOnce).to.be.true;
     expect(status.args[0][0]).to.equal(400);
@@ -364,7 +365,7 @@ describe('validation middleware', () => {
 
   it('should return 404 for no login email', () => {
     const req = { body: { ...noLoginEmail } };
-    validators.checkApplicantLoginInput(req, res, next);
+    validators.checkLoginInput(req, res, next);
     expect(next.calledOnce).to.equal(false);
     expect(status.calledOnce).to.be.true;
     expect(status.args[0][0]).to.equal(400);
@@ -647,7 +648,6 @@ describe('validation middleware', () => {
     expect(json.args[0][0].message).to.equal('provide a valid application decision');
   });
 });
-
 
 // TODO test errors in the throw catch
 // it('should pass the error into the callback if save fails', function() {
