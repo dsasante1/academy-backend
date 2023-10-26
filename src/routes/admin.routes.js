@@ -8,7 +8,6 @@ const adminValidator = require('../middlewares/validation.middleware');
 const validator = require('../middlewares/validation.middleware');
 const { checkToken } = require('../middlewares/auth.middleware');
 
-
 // login route
 router.post(
   '/login',
@@ -39,6 +38,7 @@ router.put(
   '/approve',
   // checkToken,
   adminValidator.checkDecisionInput,
+  adminMiddlewares.checkIfEmailExists,
   adminControllers.approveDeclineApplication,
 );
 

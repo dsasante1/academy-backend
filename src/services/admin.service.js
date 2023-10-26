@@ -1,8 +1,7 @@
-/* eslint-disable no-throw-literal */
 /* eslint-disable camelcase */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { provideResponse } = require('../../helper/response');
+const { provideResponse, responseProvider } = require('../../helper/response');
 const { runQuery } = require('../config/database.config');
 const adminQueries = require('../queries/admin.queries');
 const config = require('../config/env/index');
@@ -17,33 +16,35 @@ async function queryRunner(queries) {
 
 // destructure items from body ...{args}
 
-function queryTemplates(
-  args,
-  query,
-  errorMsg,
-  successMsg,
-  queryExecutor = runQuery,
-  ...queryItems) {
-  return async () => {
-    // body 
+// function queryTemplates(
+//   args,
+//   query,
+//   errorMsg,
+//   successMsg,
+//   queryExecutor = runQuery,
+//   ...queryItems) {
+//   return async () => {
+//     // body
 
-    const response = await queryExecutor(
-      query,
-      queryItems,
-    );
+//     const response = await queryExecutor(
+//       query,
+//       queryItems,
+//     );
 
-    if (!response) {
-      throw {
-        code: 400,
-        status: 'error',
-        message: errorMsg,
-        data: null,
-      };
-    }
+//     if (!response) {
+//       throw {
+//         code: 400,
+//         status: 'error',
+//         message: errorMsg,
+//         data: null,
+//       };
+//     }
 
-    return provideResponse('success', 201, successMsg, response);
-  };
-}
+//     return provideResponse('success', 201, successMsg, response);
+//   };
+// }
+
+
 
 // check password
 const checkPassword = (password, dbPassword) => {
@@ -79,67 +80,60 @@ const loginAdmin = async (
   generateLoginToken = generateToken,
 ) => {
   const { email, password } = body;
+
   // Check if that admin exists inside the db
   // const admin = await runQuery(adminQueries.findAdminByEmail, [email]);
+
   const admin = await queryExecutor(adminQueries.findAdminByEmail, [email]);
 
   if (!admin) {
-    throw {
-      code: 404,
-      status: 'error',
-      message: 'Invalid Email',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      400,
+      'Wrong email and password combination',
+      null,
+    );
   }
 
   // Compare admin passwords
   const { password: dbPassword, id } = admin[0];
 
   // const applicantPassword = bcrypt.compareSync(password, dbPassword);
-  const applicantPassword = checkAdminPassword(password, dbPassword);
+  const adminPassword = checkAdminPassword(password, dbPassword);
 
-  if (!applicantPassword) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Wrong email and password combination',
-      data: null,
-    };
+  if (!adminPassword) {
+    return provideResponse(
+      'error',
+      400,
+      'Wrong email and password combination',
+      null,
+    );
   }
 
   const options = {
     expiresIn: '1d',
   };
 
-  // Generate token for authentication purposes
-  // const token = jwt.sign(
-  //     {
-  //         id,
-  //         email,
-  //     },
-  //     config.JWT_SECRET_KEY,
-  //     options,
-  // );
-
   const token = generateLoginToken(id, email, options);
+
   if (!token) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Wrong email and password combination',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      400,
+      'Wrong email and password combination',
+      null,
+    );
   }
-  return {
-    status: 'success',
-    message: 'Admin login successfully',
-    code: 200,
-    data: {
+  return provideResponse(
+    'success',
+    200,
+    'Admin login successfully',
+    {
       id,
       email,
       token,
     },
-  };
+  );
 };
 
 const createApplication = async (body, queryExecutor = runQuery) => {
@@ -153,12 +147,12 @@ const createApplication = async (body, queryExecutor = runQuery) => {
   );
 
   if (!applicationResponse) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Application creation failed',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      500,
+      'Application creation failed',
+      null,
+    );
   }
 
   return provideResponse('success', 201, 'created application successfully', applicationResponse);
@@ -173,12 +167,12 @@ const createAssessment = async (body, queryExecutor = runQuery) => {
   );
 
   if (!assessmentResponse) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Application creation failed',
-      data: null,
-    };
+    return responseProvider(
+      'error',
+      500,
+      'Application creation failed',
+      null,
+    );
   }
 
   return provideResponse('success', 201, 'created application successfully', assessmentResponse);
@@ -193,12 +187,12 @@ const approveDeclineApplication = async (body, queryExecutor = runQuery) => {
   );
 
   if (!assessmentResponse) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Approval process failed',
-      data: null,
-    };
+    return responseProvider(
+      'error',
+      500,
+      'Approval process failed',
+      null,
+    );
   }
 
   return provideResponse('success', 201, 'Approval process successfully', assessmentResponse);
@@ -227,12 +221,12 @@ const applicationDashboard = async (queryExecutor = runQuery) => {
         || !dashboardTotalApplicants
         || !dashboardCurrentAcademy
   ) {
-    throw {
-      code: 404,
-      status: 'error',
-      message: 'Dashboard Information not found',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      404,
+      'Dashboard Information not found',
+      null,
+    );
   }
 
   const dashboard = [
@@ -243,16 +237,16 @@ const applicationDashboard = async (queryExecutor = runQuery) => {
   // // await Promise.all
 };
 
-const applicantEntries = async (queryExecutor = runQuery) => {
-  const entriesResponse = await queryExecutor(adminQueries.applicationEntries);
+const applicantEntries = async (queryExecutor = queryRunner(adminQueries.applicationEntries)) => {
+  const entriesResponse = await queryExecutor;
 
   if (!entriesResponse) {
-    throw {
-      code: 404,
-      status: 'error',
-      message: 'Admin Entries not found',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      404,
+      'Applicant Entries not found',
+      null,
+    );
   }
 
   return provideResponse('success', 200, 'Admin Entries fetched successfully', entriesResponse);
@@ -262,12 +256,12 @@ const assessmentHistory = async (queryExecutor = queryRunner(adminQueries.assess
   const assessmentResponse = await queryExecutor;
 
   if (!assessmentResponse) {
-    throw {
-      code: 404,
-      status: 'error',
-      message: 'Assessment history not found',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      404,
+      'Assessment history not found',
+      null,
+    );
   }
 
   return provideResponse('success', 200, 'Assessment history fetched successfully', assessmentResponse);
@@ -277,12 +271,12 @@ const applicantsResults = async (queryExecutor = queryRunner(adminQueries.applic
   const resultResponse = await queryExecutor;
 
   if (!resultResponse) {
-    throw {
-      code: 404,
-      status: 'error',
-      message: 'Results not found',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      404,
+      'Results not found',
+      null,
+    );
   }
 
   return provideResponse('success', 200, 'Results fetched successfully', resultResponse);
@@ -297,12 +291,12 @@ const editBatchId = async (body, queryExecutor = runQuery) => {
   );
 
   if (!editBatchIdResponse) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Edit batch Id failed',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      500,
+      'Edit Batch Id failed',
+      null,
+    );
   }
 
   return provideResponse('success', 201, 'Batch Id edited successfully', editBatchIdResponse);
@@ -314,12 +308,12 @@ const updateTimer = async (body, queryExecutor = runQuery) => {
   const editTimerResponse = await queryExecutor(adminQueries.updateTimer, [batchId, timer]);
 
   if (!editTimerResponse) {
-    throw {
-      code: 400,
-      status: 'error',
-      message: 'Edit timer failed',
-      data: null,
-    };
+    return provideResponse(
+      'error',
+      500,
+      'Edit timer failed',
+      null,
+    );
   }
 
   return provideResponse('success', 201, 'Timer edited successfully', editTimerResponse);

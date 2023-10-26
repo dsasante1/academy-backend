@@ -143,7 +143,6 @@ const checkFileUpload = (req, res, next, getPath = path.extname) => {
 const checkLoginInput = (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     if (typeof email !== 'string' || !email.includes('@')) {
       return responseProvider(res, null, 'invalid email and password', 400);
     }
@@ -211,15 +210,12 @@ const checkCreateAssessmentInput = (req, res, next) => {
 const checkDecisionInput = (req, res, next) => {
   const applicationDecision = ['pending', 'declined', 'approved'];
 
+
   try {
     const { email, applicationStatus } = req.body;
 
     if (typeof email !== 'string' || !email.includes('@')) {
       return responseProvider(res, null, 'provide a valid email', 400);
-    }
-
-    if (!adminMiddlewares.checkIfEmailExists(email)) {
-      return responseProvider(res, null, 'applicant does not exist', 400);
     }
 
     if (!applicationDecision.includes(applicationStatus)) {

@@ -58,13 +58,24 @@ const checkBatchIdDuplicate = async (req, res, next) => {
   }
 };
 
-const checkIfEmailExists = async (email) => {
-  const applicantEmail = await runQuery(applicantQueries.findApplicantByEmail, [email]);
+const checkIfEmailExists = async (req, res, next) => {
+  try {
+    const { email } = req.body;
 
-  if (!applicantEmail) {
-    return false;
+    const [applicantEmail = null] = await runQuery(applicantQueries.findApplicantByEmail, [email]);
+
+    if (!applicantEmail) {
+      return res.status(400).json({
+        status: 'error',
+        code: 400,
+        message: 'Invalid email',
+        data: null,
+      });
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  return true;
 };
 
 // check if new batch id does not

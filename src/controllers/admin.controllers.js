@@ -33,9 +33,9 @@ const createAssessment = async (req, res, next) => {
 // approve or decline applicants application
 const approveDeclineApplication = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.approveDeclineApplication(req.body);
+    const applicationDecisonResponse = await adminService.approveDeclineApplication(req.body);
 
-    return res.status(assessmentResponse.code).json(assessmentResponse);
+    return res.status(applicationDecisonResponse.code).json(applicationDecisonResponse);
   } catch (error) {
     next(error);
   }
@@ -43,9 +43,9 @@ const approveDeclineApplication = async (req, res, next) => {
 
 const applicationDashboard = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.applicationDashboard();
+    const dashboardResponse = await adminService.applicationDashboard();
 
-    return res.status(assessmentResponse.code).json(assessmentResponse);
+    return res.status(dashboardResponse.code).json(dashboardResponse);
   } catch (error) {
     next(error);
   }
@@ -53,9 +53,9 @@ const applicationDashboard = async (req, res, next) => {
 
 const applicantEntries = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.applicantEntries();
+    const entriesResponse = await adminService.applicantEntries();
 
-    return res.status(assessmentResponse.code).json(assessmentResponse);
+    return res.status(entriesResponse.code).json(entriesResponse);
   } catch (error) {
     next(error);
   }
@@ -63,9 +63,9 @@ const applicantEntries = async (req, res, next) => {
 
 const assessmentHistory = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.assessmentHistory();
+    const assessmentHistoryResponse = await adminService.assessmentHistory();
 
-    return res.status(assessmentResponse.code).json(assessmentResponse);
+    return res.status(assessmentHistoryResponse.code).json(assessmentHistoryResponse);
   } catch (error) {
     next(error);
   }

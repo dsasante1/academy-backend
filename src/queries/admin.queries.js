@@ -1,4 +1,4 @@
-const findAdminByEmail = `SELECT email, password FROM admin WHERE email=$1`;
+const findAdminByEmail = `SELECT id, email, password FROM admin WHERE email=$1`;
 
 const dashboardTotalApplicantsAcademies = `
 SELECT 
