@@ -7,17 +7,83 @@ const { runQuery } = require('../config/database.config');
 const adminQueries = require('../queries/admin.queries');
 const config = require('../config/env/index');
 // TODO: create a query to edit applications
-// already created
-//
+
+async function queryRunner(queries) {
+  const result = await runQuery(queries);
+  return result;
+}
+
+// remove duplicates, async function creator
+
+// destructure items from body ...{args}
+
+function queryTemplates(
+  args,
+  query,
+  errorMsg,
+  successMsg,
+  queryExecutor = runQuery,
+  ...queryItems) {
+  return async () => {
+    // body 
+
+    const response = await queryExecutor(
+      query,
+      queryItems,
+    );
+
+    if (!response) {
+      throw {
+        code: 400,
+        status: 'error',
+        message: errorMsg,
+        data: null,
+      };
+    }
+
+    return provideResponse('success', 201, successMsg, response);
+  };
+}
+
+// check password
+const checkPassword = (password, dbPassword) => {
+  if (!password || !dbPassword) {
+    return null;
+  }
+  const result = bcrypt.compareSync(password, dbPassword);
+  return result;
+};
+
+// generate token
+
+const generateToken = (id, email, options) => {
+  if (!id || !email || !options) {
+    return null;
+  }
+  return jwt.sign(
+    {
+      id,
+      email,
+    },
+    config.JWT_SECRET_KEY,
+    options,
+  );
+};
 
 // admin login
 
-const loginAdmin = async (body) => {
+const loginAdmin = async (
+  body,
+  queryExecutor = runQuery,
+  checkAdminPassword = checkPassword,
+  generateLoginToken = generateToken,
+) => {
   const { email, password } = body;
   // Check if that admin exists inside the db
-  const admin = await runQuery(adminQueries.findAdminByEmail, [email]);
+  // const admin = await runQuery(adminQueries.findAdminByEmail, [email]);
+  const admin = await queryExecutor(adminQueries.findAdminByEmail, [email]);
 
-  if (admin.length === 0) {
+  if (!admin) {
     throw {
       code: 404,
       status: 'error',
@@ -29,7 +95,8 @@ const loginAdmin = async (body) => {
   // Compare admin passwords
   const { password: dbPassword, id } = admin[0];
 
-  const applicantPassword = bcrypt.compareSync(password, dbPassword);
+  // const applicantPassword = bcrypt.compareSync(password, dbPassword);
+  const applicantPassword = checkAdminPassword(password, dbPassword);
 
   if (!applicantPassword) {
     throw {
@@ -45,14 +112,24 @@ const loginAdmin = async (body) => {
   };
 
   // Generate token for authentication purposes
-  const token = jwt.sign(
-    {
-      id,
-      email,
-    },
-    config.JWT_SECRET_KEY,
-    options,
-  );
+  // const token = jwt.sign(
+  //     {
+  //         id,
+  //         email,
+  //     },
+  //     config.JWT_SECRET_KEY,
+  //     options,
+  // );
+
+  const token = generateLoginToken(id, email, options);
+  if (!token) {
+    throw {
+      code: 400,
+      status: 'error',
+      message: 'Wrong email and password combination',
+      data: null,
+    };
+  }
   return {
     status: 'success',
     message: 'Admin login successfully',
@@ -65,12 +142,12 @@ const loginAdmin = async (body) => {
   };
 };
 
-const createApplication = async (body) => {
+const createApplication = async (body, queryExecutor = runQuery) => {
   const {
     link, batch_id, newDate, instructions,
   } = body;
 
-  const applicationResponse = await runQuery(
+  const applicationResponse = await queryExecutor(
     adminQueries.createApplication,
     [batch_id, link, newDate, instructions],
   );
@@ -87,10 +164,10 @@ const createApplication = async (body) => {
   return provideResponse('success', 201, 'created application successfully', applicationResponse);
 };
 
-const createAssessment = async (body) => {
+const createAssessment = async (body, queryExecutor = runQuery) => {
   const { question, timer, batch } = body;
 
-  const assessmentResponse = await runQuery(
+  const assessmentResponse = await queryExecutor(
     adminQueries.createAssessment,
     [question, timer, batch],
   );
@@ -107,11 +184,10 @@ const createAssessment = async (body) => {
   return provideResponse('success', 201, 'created application successfully', assessmentResponse);
 };
 
-
-const approveDeclineApplication = async (body) => {
+const approveDeclineApplication = async (body, queryExecutor = runQuery) => {
   const { email, applicationStatus } = body;
 
-  const [assessmentResponse = null] = await runQuery(
+  const [assessmentResponse = null] = await queryExecutor(
     adminQueries.approveDeclineApplication,
     [email, applicationStatus],
   );
@@ -128,7 +204,7 @@ const approveDeclineApplication = async (body) => {
   return provideResponse('success', 201, 'Approval process successfully', assessmentResponse);
 };
 
-const applicationDashboard = async () => {
+const applicationDashboard = async (queryExecutor = runQuery) => {
   // TODO: get individual  dashboard results into objects for easy retrieval
   // get dashboards into single array
   // use every on the dashboard array to check for errors or null values
@@ -137,19 +213,19 @@ const applicationDashboard = async () => {
     dashBoardCurrentApplicants, dashBoardHistory,
     dashboardTotalApplicants, dashboardCurrentAcademy,
   ] = await Promise.all([
-    runQuery(adminQueries.dashboardCurrentApplicantsAcademy),
-    runQuery(adminQueries.dashboardHistory),
-    runQuery(adminQueries.dashboardTotalApplicantsAcademies),
-    runQuery(adminQueries.currentAcademy),
+    queryExecutor(adminQueries.dashboardCurrentApplicantsAcademy),
+    queryExecutor(adminQueries.dashboardHistory),
+    queryExecutor(adminQueries.dashboardTotalApplicantsAcademies),
+    queryExecutor(adminQueries.currentAcademy),
   ]);
 
   // dashBoard.some((items) => !item)
 
   if (
     !dashBoardCurrentApplicants
-      || !dashBoardHistory
-      || !dashboardTotalApplicants
-      || !dashboardCurrentAcademy
+        || !dashBoardHistory
+        || !dashboardTotalApplicants
+        || !dashboardCurrentAcademy
   ) {
     throw {
       code: 404,
@@ -167,8 +243,8 @@ const applicationDashboard = async () => {
   // // await Promise.all
 };
 
-const applicantEntries = async () => {
-  const entriesResponse = await runQuery(adminQueries.applicationEntries);
+const applicantEntries = async (queryExecutor = runQuery) => {
+  const entriesResponse = await queryExecutor(adminQueries.applicationEntries);
 
   if (!entriesResponse) {
     throw {
@@ -182,8 +258,8 @@ const applicantEntries = async () => {
   return provideResponse('success', 200, 'Admin Entries fetched successfully', entriesResponse);
 };
 
-const assessmentHistory = async () => {
-  const assessmentResponse = await runQuery(adminQueries.assessmentHistory);
+const assessmentHistory = async (queryExecutor = queryRunner(adminQueries.assessmentHistory)) => {
+  const assessmentResponse = await queryExecutor;
 
   if (!assessmentResponse) {
     throw {
@@ -197,8 +273,8 @@ const assessmentHistory = async () => {
   return provideResponse('success', 200, 'Assessment history fetched successfully', assessmentResponse);
 };
 
-const applicantsResults = async () => {
-  const resultResponse = await runQuery(adminQueries.applicantsResults);
+const applicantsResults = async (queryExecutor = queryRunner(adminQueries.applicantsResults)) => {
+  const resultResponse = await queryExecutor;
 
   if (!resultResponse) {
     throw {
@@ -212,10 +288,10 @@ const applicantsResults = async () => {
   return provideResponse('success', 200, 'Results fetched successfully', resultResponse);
 };
 
-const editBatchId = async (body) => {
+const editBatchId = async (body, queryExecutor = runQuery) => {
   const { batchCreationDate, newBatchId } = body;
 
-  const editBatchIdResponse = await runQuery(
+  const editBatchIdResponse = await queryExecutor(
     adminQueries.editBatchId,
     [batchCreationDate, newBatchId],
   );
@@ -232,10 +308,10 @@ const editBatchId = async (body) => {
   return provideResponse('success', 201, 'Batch Id edited successfully', editBatchIdResponse);
 };
 
-const updateTimer = async (body) => {
+const updateTimer = async (body, queryExecutor = runQuery) => {
   const { batchId, timer } = body;
 
-  const editTimerResponse = await runQuery(adminQueries.updateTimer, [batchId, timer]);
+  const editTimerResponse = await queryExecutor(adminQueries.updateTimer, [batchId, timer]);
 
   if (!editTimerResponse) {
     throw {

@@ -18,9 +18,7 @@ async function queryRunner(queries) {
 // eslint-disable-next-line max-len
 const getCurrentBatchId = async (req, res, next, queries = queryRunner(adminQueries.currentBatch)) => {
   try {
-    const [{ batch_id = null }] = await new Promise((resolve) => {
-      setTimeout(() => resolve(queries), 700);
-    });
+    const [{ batch_id = null }] = await queries;
 
     if (!batch_id) {
       return responseProvider(res, null, 'batch id not found', 501);

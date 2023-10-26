@@ -53,7 +53,7 @@ const applicationDashboard = async (req, res, next) => {
 
 const applicantEntries = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.applicantEntries(req.body);
+    const assessmentResponse = await adminService.applicantEntries();
 
     return res.status(assessmentResponse.code).json(assessmentResponse);
   } catch (error) {
@@ -63,7 +63,7 @@ const applicantEntries = async (req, res, next) => {
 
 const assessmentHistory = async (req, res, next) => {
   try {
-    const assessmentResponse = await adminService.assessmentHistory(req.body);
+    const assessmentResponse = await adminService.assessmentHistory();
 
     return res.status(assessmentResponse.code).json(assessmentResponse);
   } catch (error) {
@@ -73,7 +73,7 @@ const assessmentHistory = async (req, res, next) => {
 
 const applicantsResults = async (req, res, next) => {
   try {
-    const applicantsResultsResponse = await adminService.applicantsResults(req.body);
+    const applicantsResultsResponse = await adminService.applicantsResults();
 
     return res.status(applicantsResultsResponse.code).json(applicantsResultsResponse);
   } catch (error) {
