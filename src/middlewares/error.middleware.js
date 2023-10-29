@@ -1,5 +1,3 @@
-const { responseProvider } = require('../../helper/response');
-
 /**
  * Error response middleware for 404 not found.
  *
@@ -7,10 +5,10 @@ const { responseProvider } = require('../../helper/response');
  * @param {Object} res
  */
 module.exports.notFound = function notFound(req, res) {
-  res.status(404).json({
-    code: 404,
-    message: 'Ooops, route not found',
-  });
+    res.status(404).json({
+        code: 404,
+        message: 'Ooops, route not found',
+    });
 };
 
 /**
@@ -23,17 +21,17 @@ module.exports.notFound = function notFound(req, res) {
  */
 // eslint-disable-next-line no-unused-vars
 module.exports.appErrorHandler = function appErrorHandler(err, req, res, next) {
-  try {
-    if (err.code && typeof err.code === 'number') {
-      return responseProvider(res, null, err.message, err.code);
-    // res.status(err.code).json({
-    //   code: err.code,
-    //   message: err.message,
-    // });
+    try {
+        if (err.code && typeof err.code === 'number') {
+            // return responseProvider(res, null, err.message, err.code);
+            return res.status(err.code).json({
+                code: err.code,
+                message: err.message,
+            });
+        }
+    } catch (error) {
+        next(err);
     }
-  } catch (error) {
-    next(err);
-  }
 };
 
 /**
@@ -45,14 +43,14 @@ module.exports.appErrorHandler = function appErrorHandler(err, req, res, next) {
  * @param  {Function} next
  */
 module.exports.genericErrorHandler = function genericErrorHandler(err, req, res, next) {
-  try {
-    return responseProvider(res, null, err.message, 500);
-    // return res.status(500).json({
-    //   code: 500,
-    //   data: '',
-    //   message: err.message,
-    // });
-  } catch (error) {
-    next(err);
-  }
+    try {
+        // return responseProvider(res, null, err.message, 500);
+        return res.status(500).json({
+            code: 500,
+            data: '',
+            message: err.message,
+        });
+    } catch (error) {
+        next(err);
+    }
 };

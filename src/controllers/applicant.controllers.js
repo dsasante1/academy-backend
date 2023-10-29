@@ -3,32 +3,25 @@
 const applicantQuery = require('../queries/applicant.queries');
 const applicantService = require('../services/applicant.service');
 const { runQuery } = require('../config/database.config');
-
+const { createController } = require('./controllers');
 // Controller creating a new applicant
 // eslint-disable-next-line max-len
-function createApplicant(service = applicantService.createApplicant, query = applicantQuery, queryExecutor = runQuery) {
-  return async (req, res, next) => {
-    try {
-      const response = await service(req.body, query, queryExecutor);
+function createApplicant(controller = 
+createController(applicantService.createApplicant,
+    applicantQuery,
+    runQuery)) {
+  return controller;
+  }
 
-      return res.status(response.code).json(response);
-    } catch (error) {
-      next(error);
-    }
-  };
-}
 
 // Login controller
 
-function signInApplicant(service = applicantService.loginApplicant, query = applicantQuery, queryExecutor = runQuery) {
-  return async (req, res, next) => {
-    try {
-      const result = await service(req.body, query, queryExecutor);
-      return res.status(result.code).json(result);
-    } catch (error) {
-      next(error);
-    }
-  };
+function signInApplicant(controller = createController(
+  applicantService.loginApplicant,
+  applicantQuery,
+  runQuery,
+)) {
+  return controller;
 }
 
 // upload applicant image src to database
@@ -66,17 +59,14 @@ function applicantDocDb(service = applicantService, query = applicantQuery, quer
   };
 }
 
-// Upload applicant details to database
-function applicantDetailsDb(service = applicantService.setApplicantDetailsDb, query = applicantQuery, queryExecutor = runQuery) {
-  return async (req, res, next) => {
-    try {
-      const response = await service(req.body, query, queryExecutor);
-
-      return res.status(response.code).json(response);
-    } catch (error) {
-      next(error);
-    }
-  };
+function applicantDetailsDb(
+  controller = createController(
+    applicantService.setApplicantDetailsDb,
+    applicantQuery,
+    runQuery,
+  ),
+) {
+  return controller;
 }
 
 module.exports = {
