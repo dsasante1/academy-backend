@@ -204,7 +204,6 @@ const updateTimer = async (body, queryExecutor = runQuery) => {
 // createAdminProfile,
 
 module.exports = {
-  login,
   loginAdmin,
   createApplication,
   createAssessment,
