@@ -12,7 +12,7 @@ const { checkToken } = require('../middlewares/auth.middleware');
 router.post(
   '/login',
   validator.checkLoginInput,
-  adminControllers.signInAdmin,
+  adminControllers.logInAdmin,
 );
 
 router.post(

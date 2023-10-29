@@ -1,13 +1,5 @@
- 
-/* eslint-disable max-len */
-/* eslint-disable consistent-return */
-// const applicantQuery = require('../queries/applicant.queries');
-// const applicantService = require('../services/applicant.service');
-// const { runQuery } = require('../config/database.config');
-
-// Controller creating a new applicant
-// eslint-disable-next-line max-len
 function createController(service, query, runQuerry) {
+  // eslint-disable-next-line consistent-return
   return async (req, res, next) => {
     try {
       const response = await service(req.body, query, runQuerry);
@@ -19,6 +11,12 @@ function createController(service, query, runQuerry) {
   };
 }
 
+
+function loginController(service, query, runQuerry) {
+  return true
+}
+
 module.exports = {
   createController,
+  loginController,
 };

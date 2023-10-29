@@ -5,136 +5,18 @@ const { provideResponse, responseProvider } = require('../../helper/response');
 const { runQuery } = require('../config/database.config');
 const adminQueries = require('../queries/admin.queries');
 const config = require('../config/env/index');
+const { loginService } = require('./service');
 // TODO: create a query to edit applications
 
-async function queryRunner(queries) {
-  const result = await runQuery(queries);
+async function loginAdmin(
+  body,
+  queryRunner = runQuery,
+  query = adminQueries.findAdminByEmail,
+  loginServices = loginService,
+) {
+  const result = await loginServices(body, queryRunner, query);
   return result;
 }
-
-// remove duplicates, async function creator
-
-// destructure items from body ...{args}
-
-// function queryTemplates(
-//   args,
-//   query,
-//   errorMsg,
-//   successMsg,
-//   queryExecutor = runQuery,
-//   ...queryItems) {
-//   return async () => {
-//     // body
-
-//     const response = await queryExecutor(
-//       query,
-//       queryItems,
-//     );
-
-//     if (!response) {
-//       throw {
-//         code: 400,
-//         status: 'error',
-//         message: errorMsg,
-//         data: null,
-//       };
-//     }
-
-//     return provideResponse('success', 201, successMsg, response);
-//   };
-// }
-
-
-
-// check password
-const checkPassword = (password, dbPassword) => {
-  if (!password || !dbPassword) {
-    return null;
-  }
-  const result = bcrypt.compareSync(password, dbPassword);
-  return result;
-};
-
-// generate token
-
-const generateToken = (id, email, options) => {
-  if (!id || !email || !options) {
-    return null;
-  }
-  return jwt.sign(
-    {
-      id,
-      email,
-    },
-    config.JWT_SECRET_KEY,
-    options,
-  );
-};
-
-// admin login
-
-const loginAdmin = async (
-  body,
-  queryExecutor = runQuery,
-  checkAdminPassword = checkPassword,
-  generateLoginToken = generateToken,
-) => {
-  const { email, password } = body;
-
-  // Check if that admin exists inside the db
-  // const admin = await runQuery(adminQueries.findAdminByEmail, [email]);
-
-  const admin = await queryExecutor(adminQueries.findAdminByEmail, [email]);
-
-  if (!admin) {
-    return provideResponse(
-      'error',
-      400,
-      'Wrong email and password combination',
-      null,
-    );
-  }
-
-  // Compare admin passwords
-  const { password: dbPassword, id } = admin[0];
-
-  // const applicantPassword = bcrypt.compareSync(password, dbPassword);
-  const adminPassword = checkAdminPassword(password, dbPassword);
-
-  if (!adminPassword) {
-    return provideResponse(
-      'error',
-      400,
-      'Wrong email and password combination',
-      null,
-    );
-  }
-
-  const options = {
-    expiresIn: '1d',
-  };
-
-  const token = generateLoginToken(id, email, options);
-
-  if (!token) {
-    return provideResponse(
-      'error',
-      400,
-      'Wrong email and password combination',
-      null,
-    );
-  }
-  return provideResponse(
-    'success',
-    200,
-    'Admin login successfully',
-    {
-      id,
-      email,
-      token,
-    },
-  );
-};
 
 const createApplication = async (body, queryExecutor = runQuery) => {
   const {
@@ -322,6 +204,7 @@ const updateTimer = async (body, queryExecutor = runQuery) => {
 // createAdminProfile,
 
 module.exports = {
+  login,
   loginAdmin,
   createApplication,
   createAssessment,

@@ -1,14 +1,14 @@
 const adminService = require('../services/admin.service');
+const { createController, loginController } = require('./controllers');
 
-// Admin Login controller
-const signInAdmin = async (req, res, next) => {
+async function logInAdmin(req, res, next, service = adminService.loginAdmin) {
   try {
-    const result = await adminService.loginAdmin(req.body);
+    const result = await service(req.body);
     return res.status(result.code).json(result);
   } catch (error) {
-    next(error);
+    return next(error);
   }
-};
+}
 
 const createApplication = async (req, res, next) => {
   try {
@@ -104,7 +104,7 @@ const editTimer = async (req, res, next) => {
 // adminService.updateTimer
 
 module.exports = {
-  signInAdmin,
+  logInAdmin,
   createApplication,
   createAssessment,
   approveDeclineApplication,

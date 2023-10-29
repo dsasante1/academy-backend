@@ -6,13 +6,14 @@ const { runQuery } = require('../config/database.config');
 const { createController } = require('./controllers');
 // Controller creating a new applicant
 // eslint-disable-next-line max-len
-function createApplicant(controller = 
-createController(applicantService.createApplicant,
-    applicantQuery,
-    runQuery)) {
+function createApplicant(controller =
+createController(
+  applicantService.createApplicant,
+  applicantQuery,
+  runQuery,
+)) {
   return controller;
-  }
-
+}
 
 // Login controller
 
