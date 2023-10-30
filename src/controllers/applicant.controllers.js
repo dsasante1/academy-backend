@@ -6,9 +6,9 @@ const { runQuery } = require('../config/database.config');
 const { createController } = require('./controllers');
 // Controller creating a new applicant
 // eslint-disable-next-line max-len
-function createApplicant(controller =
+function signUpApplicant(controller =
 createController(
-  applicantService.createApplicant,
+  applicantService.signUpApplicant,
   applicantQuery,
   runQuery,
 )) {
@@ -17,13 +17,28 @@ createController(
 
 // Login controller
 
-function signInApplicant(controller = createController(
-  applicantService.loginApplicant,
-  applicantQuery,
-  runQuery,
-)) {
+function logInApplicant(
+  controller = createController(
+    applicantService.loginApplicant,
+    applicantQuery.findApplicantByEmail,
+    runQuery,
+  ),
+) {
   return controller;
 }
+
+
+
+// Login controller
+
+// async function logInApplicant(req, res, next, service = applicantService.loginApplicant) {
+//   try {
+//     const result = await service(req.body);
+//     return res.status(result.code).json(result);
+//   } catch (error) {
+//     return next(error);
+//   }
+// }
 
 // upload applicant image src to database
 function applicantImageDb(service = applicantService.setApplicantImageDb, query = applicantQuery, queryExecutor = runQuery) {
@@ -71,8 +86,8 @@ function applicantDetailsDb(
 }
 
 module.exports = {
-  createApplicant,
-  signInApplicant,
+  signUpApplicant,
+  logInApplicant,
   applicantImageDb,
   applicantDocDb,
   applicantDetailsDb,

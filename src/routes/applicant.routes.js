@@ -9,10 +9,10 @@ const upload = require('../../utils/upload.file');
 const applicantControllers = require('../controllers/applicant.controllers');
 
 // signup route
-router.post('/signup', validator.checkSignUpApplicantInput, applicantControllers.createApplicant());
+router.post('/signup', validator.checkSignUpApplicantInput, applicantControllers.signUpApplicant());
 
 // login route
-router.post('/login', validator.checkLoginInput, applicantControllers.signInApplicant());
+router.post('/login', validator.checkLoginInput, applicantControllers.logInApplicant());
 
 // applicant upload files
 router.post(

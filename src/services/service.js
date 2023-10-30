@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { provideResponse, responseProvider } = require('../../helper/response');
+const { provideResponse } = require('../../helper/response');
 const { runQuery } = require('../config/database.config');
-// const adminQueries = require('../queries/admin.queries');
+
 const config = require('../config/env/index');
 
 async function queryRunner(queries) {
@@ -44,10 +44,9 @@ const loginService = async (
 ) => {
   const { email, password } = body;
 
-  // Check if that admin exists inside the db
   const response = await runQueries(query, [email]);
 
-  if (!response) {
+  if (!response || response.length === 0) {
     return provideResponse(
       'error',
       400,
@@ -88,11 +87,7 @@ const loginService = async (
     'success',
     200,
     'Login successful',
-    {
-      id,
-      email,
-      token,
-    },
+    response[0],
   );
 };
 
