@@ -1,6 +1,5 @@
 'use strict';
-// // TODO implement seeders
-// TODO exclude this file from git 
+
 // var dbm;
 // var type;
 // var seed;

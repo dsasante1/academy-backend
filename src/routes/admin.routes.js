@@ -63,7 +63,7 @@ router.put(
   adminControllers.editBatchId,
 );
 
-// TODO the batch checker should check
+
 router.put(
   '/timer',
   // checkToken,

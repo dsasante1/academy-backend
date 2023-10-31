@@ -27,19 +27,6 @@ function logInApplicant(
   return controller;
 }
 
-
-
-// Login controller
-
-// async function logInApplicant(req, res, next, service = applicantService.loginApplicant) {
-//   try {
-//     const result = await service(req.body);
-//     return res.status(result.code).json(result);
-//   } catch (error) {
-//     return next(error);
-//   }
-// }
-
 // upload applicant image src to database
 function applicantImageDb(service = applicantService.setApplicantImageDb, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
@@ -59,14 +46,14 @@ function applicantImageDb(service = applicantService.setApplicantImageDb, query 
 }
 
 // Upload doc url to database
-function applicantDocDb(service = applicantService, query = applicantQuery, queryExecutor = runQuery) {
+function applicantDocDb(service = applicantService.setApplicantDocDb, query = applicantQuery, queryExecutor = runQuery) {
   return async (req, res, next) => {
     try {
       const { email } = req.body;
 
       const { cvUrl } = req;
 
-      await service.setApplicantDocDb(cvUrl, email, query, queryExecutor);
+      await service(cvUrl, email, query, queryExecutor);
 
       return next();
     } catch (error) {

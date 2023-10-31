@@ -1,20 +1,18 @@
 /* eslint-disable camelcase */
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+
 const { provideResponse, responseProvider } = require('../../helper/response');
 const { runQuery } = require('../config/database.config');
 const adminQueries = require('../queries/admin.queries');
-const config = require('../config/env/index');
-const { loginService } = require('./service');
+const { loginService, queryRunner } = require('./service');
 // TODO: create a query to edit applications
 
 async function loginAdmin(
   body,
-  queryRunner = runQuery,
+  runQueries = runQuery,
   query = adminQueries.findAdminByEmail,
   loginServices = loginService,
 ) {
-  const result = await loginServices(body, queryRunner, query);
+  const result = await loginServices(body, runQueries, query);
   return result;
 }
 
@@ -81,10 +79,6 @@ const approveDeclineApplication = async (body, queryExecutor = runQuery) => {
 };
 
 const applicationDashboard = async (queryExecutor = runQuery) => {
-  // TODO: get individual  dashboard results into objects for easy retrieval
-  // get dashboards into single array
-  // use every on the dashboard array to check for errors or null values
-
   const [
     dashBoardCurrentApplicants, dashBoardHistory,
     dashboardTotalApplicants, dashboardCurrentAcademy,

@@ -55,7 +55,6 @@ const createAssessment = `INSERT INTO assesment (
 
 `;
 
-// TODO add date computed, no. of questions, status - taken | pending
 const assessmentHistory = `select batch, date_computed,
 number_of_questions, timer,
 exams  from assesment`;
@@ -83,7 +82,6 @@ RETURNING batch, timer
 
 `;
 
-// TODO edit batchID
 const editBatchId = `
 UPDATE application
 SET batch_id=$2

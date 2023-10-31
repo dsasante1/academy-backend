@@ -104,7 +104,6 @@ const checkApplicationInput = (req, res, next) => {
       return responseProvider(res, null, 'provide a valid university name', 400);
     }
 
-    // TODO use regex
     if (!cgpa || !isCgpaValid(cgpa)) {
       return responseProvider(res, null, 'provide a valid cgpa', 400);
     }

@@ -1,13 +1,9 @@
 /* eslint-disable no-throw-literal */
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
 const { provideResponse } = require('../../helper/response');
-const applicantQueries = require('../queries/applicant.queries');
 const { runQuery } = require('../config/database.config');
-const config = require('../config/env/index');
 const { loginService } = require('./service');
-// TODO use login service
-// defined in serivices files 
 
 // create a applicant
 const signUpApplicant = async (body, applicantQuery, queryExecutor) => {
@@ -49,6 +45,7 @@ const signUpApplicant = async (body, applicantQuery, queryExecutor) => {
   );
 };
 
+// applicant login
 async function loginApplicant(
   body,
   applicantQuery,
@@ -59,66 +56,6 @@ async function loginApplicant(
   return result;
 }
 
-
-// applicant login
-
-// const loginApplicant = async (body, applicantQuery, queryExecutor) => {
-//   const { email, password } = body;
-
-//   // Check if that applicant exists inside the db
-//   const applicant = await queryExecutor(applicantQuery.findApplicantByEmail, [email]);
-
-//   if (applicant.length === 0) {
-//     throw {
-//       code: 404,
-//       status: 'error',
-//       message: 'Invalid Email',
-//       data: null,
-//     };
-//   }
-
-//   // Compare applicant passwords
-//   const {
-//     password: dbPassword, id, firstname, lastname,
-//   } = applicant[0];
-
-//   const applicantPassword = bcrypt.compareSync(password, dbPassword);
-
-//   if (!applicantPassword) {
-//     throw {
-//       code: 400,
-//       status: 'error',
-//       message: 'Wrong email and password combination',
-//       data: null,
-//     };
-//   }
-
-//   const options = {
-//     expiresIn: '1d',
-//   };
-
-//   // Generate token for authentication purposes
-//   const token = jwt.sign(
-//     {
-//       id,
-//       email,
-//     },
-//     config.JWT_SECRET_KEY,
-//     options,
-//   );
-//   return {
-//     status: 'success',
-//     message: 'Applicant login successfully',
-//     code: 200,
-//     data: {
-//       id,
-//       firstname,
-//       lastname,
-//       email,
-//       token,
-//     },
-//   };
-// };
 
 // Fetches all applicants in the database
 const getAllApplicants = async (applicantQuery, queryExecutor) => {
